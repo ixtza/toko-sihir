@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_PORT = os.getenv('APP_PORT')
+APP_PORT = 5000 if os.getenv('APP_PORT') is None else os.getenv('APP_PORT')
+APP_NAME = 'Toko Sihir Ajaib' if os.getenv(
+    'APP_NAME') is None else os.getenv('APP_NAME')
 
 app = Flask(__name__)
 
@@ -19,7 +21,7 @@ potions = {
 
 @app.route('/')
 def welcome():
-    return "Selamat datang di Toko Sihir Ajaib! Pesan ramuan di /order/<nama_ramuan>"
+    return f"Selamat datang di {APP_NAME}! Pesan ramuan di /order/<nama_ramuan>"
 
 
 @app.route('/order/<potion>')
@@ -31,4 +33,4 @@ def order_potion(potion):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000 if APP_PORT is None else APP_PORT)
+    app.run(host='0.0.0.0', port=APP_PORT)
