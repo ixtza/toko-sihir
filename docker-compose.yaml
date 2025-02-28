@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  web:
+    image: ixtza/playground:toko-sihir-v1
+    depends_on:
+      - db
+    networks:
+      - konoha
+    ports:
+      - "5050:5000"
+    environment:
+      # - APP_NAME=
+      # - POSTGRES_HOST=
+      # - POSTGRES_PORT=
+      # - POSTGRES_DATABASE=
+      # - POSTGRES_USERNAME=
+      # - POSTGRES_PASSWORD=
+  db:
+    networks:
+      - konoha
+    image: ixtza/playground:toko-sihir-gudang
+    environment:
+      # - POSTGRES_PASSWORD=
+networks:
+  konoha:
+    name: konoha
+    external: false
