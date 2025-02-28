@@ -3,6 +3,8 @@ import os
 import time
 from dotenv import load_dotenv
 import psycopg2
+import psycopg2.errorcodes
+import logging
 from psycopg2.extras import RealDictCursor
 
 load_dotenv()
@@ -25,15 +27,26 @@ class DBPostgre:
         'POSTGRES_PASSWORD') is None else os.getenv('POSTGRES_PASSWORD')
 
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
 app = Flask(__name__)
 
-conn = None if DBPostgre.PG_HOST is None else psycopg2.connect(
-    database=DBPostgre.PG_DATABASE,
-    host=DBPostgre.PG_HOST,
-    user=DBPostgre.PG_USERNAME,
-    password=DBPostgre.PG_PASSWORD,
-    port=DBPostgre.PG_PORT
-)
+conn = None
+
+try:
+    conn = None if DBPostgre.PG_HOST is None else psycopg2.connect(
+        database=DBPostgre.PG_DATABASE,
+        host=DBPostgre.PG_HOST,
+        user=DBPostgre.PG_USERNAME,
+        password=DBPostgre.PG_PASSWORD,
+        port=DBPostgre.PG_PORT
+    )
+except psycopg2.OperationalError as e:
+    logger.warning(f"db operational error code:\n{e}")
+except psycopg2.DatabaseError as e:
+    logger.warning(f"db database error code:\n{e}")
+
 
 # Daftar ramuan yang tersedia
 potions = {
@@ -76,11 +89,11 @@ if __name__ == '__main__':
     try:
         app.run(host='0.0.0.0', port=APP_PORT)
     finally:
-        print("shuting down app...")
+        logger.info("shuting down app...")
         if conn is not None:
-            print("shuting down db...")
+            logger.info("shuting down db...")
             conn.close()
             if conn.closed == 1:
-                print("\tdb connection successfully closed")
+                logger.info("\tdb connection successfully closed")
             time.sleep(5)
-        print("exiting")
+        logger.info("exiting")
