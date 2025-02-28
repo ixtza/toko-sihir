@@ -95,5 +95,5 @@ if __name__ == '__main__':
             conn.close()
             if conn.closed == 1:
                 logger.info("\tdb connection successfully closed")
-            time.sleep(5)
+            time.sleep(2)
         logger.info("exiting")
