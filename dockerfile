@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # 4. Menginstal bahan-bahan penting (pip dan Flask)
-RUN pip install flask dotenv
+RUN pip install flask dotenv psycopy2
 
 # 5. Menentukan pintu masuk pelanggan (port 5000)
 EXPOSE 5000
