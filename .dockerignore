@@ -87,3 +87,9 @@ venv/
 
 # VS Code
 .vscode/
+
+# Data
+guest_list/*
+
+# Git
+!.gitkeep

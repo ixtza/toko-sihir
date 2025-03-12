@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import os
 import time
 from dotenv import load_dotenv
@@ -29,6 +29,12 @@ class DBPostgre:
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
+
+if os.path.isfile('./guest_list/attendance.txt'):
+    logger.info("attendance.txt exists skipping init...")
+else:
+    logger.info("creating attendance.txt...")
+    open('./guest_list/attendance.txt', 'a').close()
 
 app = Flask(__name__)
 
@@ -83,6 +89,28 @@ def gudang_barang():
             return jsonify({"message": f"terjadi gangguan pada gudang", "data": None}), 500
         finally:
             cur.close()
+
+
+@app.route('/attendance', methods=['GET', 'POST'])
+def attendance():
+    if request.method == 'GET':
+        attendances = []
+        with open('./guest_list/attendance.txt', 'r') as file:
+            for line in file:
+                if line is not None:
+                    attendances.append(line.strip())
+        return jsonify({"message": f"get attendance data", "data": attendances}), 200 if len(attendances) > 0 else 404
+    if request.method == 'POST':
+        content = request.json
+
+        if 'name' not in content:
+            return jsonify({"message": f"mising name from payload", "data": None}), 400
+        logger.info(repr(content['name']))
+        with open('./guest_list/attendance.txt', 'a+') as file:
+            file.write(repr(content['name'])+'\n')
+
+        return jsonify({"message": f"create attendance data", "data": content['name']}), 201
+    return jsonify({"message": f"terjadi gangguan pada attendance", "data": None}), 500
 
 
 if __name__ == '__main__':
